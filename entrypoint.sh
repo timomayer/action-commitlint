@@ -1,11 +1,16 @@
 #!/bin/sh
-set -e
 
-if [ -n "${GITHUB_WORKSPACE}" ] ; then
-  cd "${GITHUB_WORKSPACE}/${INPUT_WORKDIR}" || exit
-fi
+cd "$GITHUB_WORKSPACE"
 
 export REVIEWDOG_GITHUB_API_TOKEN="${INPUT_GITHUB_TOKEN}"
+
+cd "${GITHUB_WORKSPACE}/${INPUT_WORKDIR}" || exit 1
+
+if [ ! -f "$(npm bin)/commitlint" ]; then
+  npm install
+fi
+
+$(npm bin)/commitlint --version
 
 commitlint \
   | reviewdog -efm="%f:%l:%c: %m" \
